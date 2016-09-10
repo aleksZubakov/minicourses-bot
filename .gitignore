@@ -96,3 +96,6 @@ ENV/
 # Test files
 tests
 
+# Database
+data
+

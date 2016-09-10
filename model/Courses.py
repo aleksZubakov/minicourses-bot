@@ -22,8 +22,17 @@ class Courses:
 
         bot_record = self.collection.find_one( { 'token': raw_data['token'] } )
         if bot_record is None:
+            # From User Data
             data['token'] = raw_data['token']
+            data['bot_name'] = raw_data['name']
+            data['screen_name'] = raw_data['screen_name']
+            data['tags'] = raw_data['tags']
+            data['author'] = raw_data['author']
+            data['description'] = raw_data['description']
             data['messages'] = list( raw_data['messages'] )
+
+            # Init with default
+            data['connections_count'] = 0
             data['connections'] = dict()
 
             self.collection.insert_one(data)
@@ -41,15 +50,25 @@ class Courses:
         if bot_record is None:
             raise ValueError('Not bot present with token "{0}"'.format(bot_token))
         print('>',bot_record)
+
         connections = bot_record['connections']
 
         new_user = connections[str(chat_id)] = dict()
         new_user['last_read'] = False
         new_user['messages_number'] = 0
 
+        try:
+            new_connections_count = bot_record['connections_count'] + 1
+        except KeyError:
+            c = 0
+            for i in bot_record['connections']:
+                c += 1
+            new_connections_count = c
+
+
         self.collection.update(
             { 'token': bot_token },
-            { '$set': {'connections': connections } },
+            { '$set': {'connections': connections, 'connections_count': new_connections_count } },
             upsert=False
         )
 
@@ -100,3 +119,6 @@ class Courses:
 
         return True
 
+
+    def get_all_courses(self):
+        pass
