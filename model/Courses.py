@@ -6,7 +6,8 @@ db = client['courses']
 # Dev Collection
 courses_collection = db['test']
 
-class Courses():
+
+class Courses:
 
     def __init__(self):
         self.env = 'dev'
@@ -19,12 +20,16 @@ class Courses():
     def init_bot(self, raw_data):
         data = {}
 
-        data['token'] = raw_data['token']
-        data['messages'] = list( raw_data['messages'] )
-        data['connections'] = dict()
+        bot_record = self.collection.find_one( { 'token': raw_data['token'] } )
+        if bot_record is None:
+            data['token'] = raw_data['token']
+            data['messages'] = list( raw_data['messages'] )
+            data['connections'] = dict()
 
-
-        self.collection.insert_one(data)
+            self.collection.insert_one(data)
+            return True
+        else:
+            raise IndexError('Bot with token "{0}" already exists'.format(raw_data['token']))
 
     def get_description(self):
         pass
