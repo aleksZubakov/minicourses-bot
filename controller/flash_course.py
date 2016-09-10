@@ -13,17 +13,15 @@ import threading
 from telegram.ext import Updater, Handler, CommandHandler, MessageHandler, Filters
 from telegram.replykeyboardmarkup import ReplyKeyboardMarkup
 from telegram import KeyboardButton
-
-# from model.Courses import Courses
+from model.Courses import Courses
 
 
 """ Handlers """
 def on_start_command(bot, update):
     chat_id = update.message.chat_id
-    #initialize number of message
     clients[chat_id] = {'red_message': True,
-                        'timer' : 3}
-    #first_message = md.new_user(token, chat_id)
+                        'timer' : 10}
+    first_message = md.new_user(token, chat_id)
 
     user_name = update.message.from_user['first_name'] + " " + update.message.from_user['last_name']
     welcome_message = 'Привет, {0}.'.format(user_name) + \
@@ -64,13 +62,13 @@ def send_course_message():
             if client['timer'] <= 0:
                 if client['red_message']:
                     message = 'lorem ipsum'
-                    #timer, message =  model.get_info(token, chat_id)
+                    timer, message =  md.get_info(token, chat_id)
                     key_board = ReplyKeyboardMarkup([['Прочитал, вполне прикольно :)']], one_time_keyboard=True)
                     updater.bot.sendMessage(chat_id=chat_id, text=message, reply_markup=key_board)
 
                     client['red_message'] = False
-                    # model.set_read(token, chat_id)
-                    # client['timer'] =
+                    md.set_read(token, chat_id)
+                    client['timer'] = timer
                 else:
                     continue
             else:
@@ -105,6 +103,7 @@ if __name__ == '__main__':
 
     # database init
 
-    # model = Courses()
-    # model.init_bot(token)
+    md = Courses()
+    # Todo in Bot Constructor
+    # md.init_bot(token)
 

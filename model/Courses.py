@@ -100,7 +100,7 @@ class Courses:
         print(updated_bot_record)
 
 
-        return updated_bot_record['messages'][msg_number]
+        return 10, updated_bot_record['messages'][msg_number]
 
 
 
