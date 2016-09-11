@@ -50,7 +50,7 @@ def on_start_command( bot, update ):
         TOK: {7}""".format(i,
                    ent['screen_name'],
                    ent['description'],
-                   '@'+ ent['bot_name'],
+                   '@' + ent['bot_name'],
                    ent['author'],
                    ent['connections_count'],
                    ent['tags'],

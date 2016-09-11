@@ -73,7 +73,6 @@ def on_message_handler(bot, update):
             if not chat_id in clients:
                 clients[chat_id] = dict()
 
-
             clients[chat_id][token] = dict()
             clients[chat_id][token]['messages'] = list()
             clients[chat_id]['current_token'] = token
@@ -184,7 +183,7 @@ if __name__ == '__main__':
                'Помощь': helper_help,
                'Главное меню': helper_main_menu,
                'Я получил токен': helper_got_token,
-               'Добавить сообщение в микрокурс': helper_add_new_message }
+               'Добавить сообщение в микрокурс': helper_add_new_message}
                # 'Добавить описание' : helper_add_description}
 
     # handlers

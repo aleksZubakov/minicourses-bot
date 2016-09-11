@@ -90,6 +90,10 @@ if __name__ == '__main__':
     clients = dict()
     #print('test')
 
+    # database init
+    md = Courses()
+
+
     #token parsing
     parser = argparse.ArgumentParser(description='Run flash-course telegram bot by your token')
     parser.add_argument('token', help='Just add token;)',
@@ -98,8 +102,11 @@ if __name__ == '__main__':
 
     #telegram updater
     updater = Updater(token=token)
-    updater.bot.getMe()
     dispatcher = updater.dispatcher
+
+    bt_name = updater.bot.getMe()
+
+    md.set_name(token, bt_name['username'], '{0} {1}'.format(bt_name['first_name'], bt_name['last_name']))
 
     #handlers
     start_handler = CommandHandler('start', on_start_command)
@@ -112,9 +119,7 @@ if __name__ == '__main__':
     for target in threads_targets:
         threading.Thread(target=target).start()
 
-    # database init
 
-    md = Courses()
     # Todo in Bot Constructor
     # md.init_bot(token)
 
