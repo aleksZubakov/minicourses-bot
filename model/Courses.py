@@ -39,18 +39,22 @@ class Courses:
             self.collection.insert_one(data)
             return True
         else:
-            raise IndexError('Bot with token "{0}" already exists'.format(raw_data['token']))
+            raise Error('Bot with token "{0}" already exists'.format(raw_data['token']))
 
     def get_description(self):
         pass
 
     def new_user(self, bot_token, chat_id):
         chat_id = str(chat_id)
-
+        print(self.collection, bot_token, chat_id)
         bot_record = self.collection.find_one({ 'token': bot_token })
-        # print(bot_record)
+        print(bot_record)
         if bot_record is None:
-            raise ValueError('Not bot present with token "{0}"'.format(bot_token))
+            for i in self.collection.find():
+                print(i)
+            for db in client.database_names():
+                print(db)
+            print('Not bot present with token "{0}"'.format(bot_token))
         print('>',bot_record)
 
         connections = bot_record['connections']

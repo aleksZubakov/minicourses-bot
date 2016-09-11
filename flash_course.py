@@ -18,7 +18,7 @@ from model.Courses import Courses
 """ Handlers """
 def on_start_command(bot, update):
     chat_id = update.message.chat_id
-    print('>>',chat_id)
+    print('>>',chat_id, token)
     timer, first_message = md.new_user(token, chat_id)
     print('>>',timer, first_message)
     clients[chat_id] = {'red_message': True,
