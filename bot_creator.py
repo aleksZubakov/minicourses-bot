@@ -20,7 +20,7 @@ def on_start_command(bot, update):
         = clients[chat_id]['last_message_flag'] = False
 
     start_keyboard = ReplyKeyboardMarkup(new_course_button + help_button, one_time_keyboard=True)
-    bot.sendMessage(chat_id=chat_id, text='Привет! Ты попал в @sympocreator_bot. Выбирай действие:)',
+    bot.sendMessage(chat_id=chat_id, text='Привет! Вы попали в @sympolab_bot. Выбирайте действие:)',
                     reply_markup=start_keyboard)
 
 
@@ -157,11 +157,11 @@ def helper_main_menu(bot, chat_id):
 
 
 def helper_create_new_course(bot, chat_id):
-    create_msg = "{0} Открывай @BotFather. Жмякай для этого на его имя".format(emoji_nums[1]) + '\n' + \
-                 "{0} С его помощью создай нового бота. Для этого нажми 'new bot' внутри @BotFather".format(
+    create_msg = "{0} Откройте @BotFather.  Для этого нажмите его имя".format(emoji_nums[1]) + '\n' + \
+                 "{0} С его помощью создай нового бота. Для этого нажмите 'new bot' внутри @BotFather".format(
                      emoji_nums[2]) + '\n' + \
-                 "{0} Скопируй API token, который он тебе даст.".format(emoji_nums[3]) + '\n' + \
-                 "{0} Вернись обратно в @sypmocreator_bot и отправь сюда скопированный API токен".format(emoji_nums[4])
+                 "{0} Скопируйте API token, который он тебе даст.".format(emoji_nums[3]) + '\n' + \
+                 "{0} Вернитесь обратно в @sypmolab_bot и отправьте сюда скопированный API токен".format(emoji_nums[4])
     got_token_keyboard = ReplyKeyboardMarkup(got_token_button + main_menu_button, one_time_keyboard=True,
                                              resize_keyboard=False)
     bot.sendMessage(chat_id=chat_id, text=create_msg, reply_markup=got_token_keyboard)
@@ -169,7 +169,7 @@ def helper_create_new_course(bot, chat_id):
 
 def helper_add_new_message(bot, chat_id):
     clients[chat_id]['add_message_flag'] = True
-    bot.sendMessage(chat_id=chat_id, text='Напиши что хочешь добавить в свой микрокурс.')
+    bot.sendMessage(chat_id=chat_id, text='Напишите что хочешь добавить в свой микрокурс.')
 
 
 if __name__ == '__main__':
