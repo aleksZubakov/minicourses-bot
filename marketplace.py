@@ -12,7 +12,7 @@ db = client['courses']
 collection = db['test']
 
 # setup updater, dispatcher, and logging
-updater = Updater( token='216141785:AAHp0UsV5wnG03KuAMhbjxafw_9LujrdkSs' )
+updater = Updater( token='296973878:AAG8-Gu2ESh8rSbXX0S14R_8uJtC4opjCKY' )
 dispatcher = updater.dispatcher
 logging.basicConfig( format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                      level=logging.WARNING )
@@ -26,6 +26,10 @@ def add_handlers( handlers ):
 
 # Globals
 CURRENT_MODE = dict()
+show_more = KeyboardButton('Показать еще')
+popular = KeyboardButton('Популярное')
+new = KeyboardButton('Новое')
+tag_search = KeyboardButton('Поиск по тегам')
 
 # unknown command handler
 # def on_unknown_command(bot, update):
@@ -39,6 +43,7 @@ def on_start_command( bot, update ):
     courses = collection.find().sort( 'connections_count', -1 )
     i = 0
     messages = list()
+    messages.append('ПОПУЛЯРНОЕ /')
     data = list(courses)
     for ent in data:
         i += 1
@@ -68,9 +73,8 @@ def on_start_command( bot, update ):
     }
     # print('!!!',CURRENT_MODE, CURRENT_MODE[chat_id], '\n', CURRENT_MODE[chat_id]['data'])
 
-    repl = ReplyKeyboardMarkup([[KeyboardButton("Показать еще")],
-                                [KeyboardButton("Популярное")],
-                                [KeyboardButton("Новое")]])
+    repl = ReplyKeyboardMarkup([[show_more],
+                                [new]])
 
     bot.sendMessage( chat_id=update.message.chat_id,
                      text='\n'.join(messages),
@@ -83,9 +87,9 @@ def on_message( bot, update ):
     if message == 'Показать еще':
         i = 0
         messages = []
-        print('>>', CURRENT_MODE)
-        print('>>',CURRENT_MODE[str(chat_id)])
-        print('>>', CURRENT_MODE[str(chat_id)]['data'])
+        # print('>>', CURRENT_MODE)
+        # print('>>',CURRENT_MODE[str(chat_id)])
+        # print('>>', CURRENT_MODE[str(chat_id)]['data'])
         for ent in CURRENT_MODE[str(chat_id)]['data']:
             i += 1
             msg = u"""{0}: {1}
@@ -111,7 +115,21 @@ def on_message( bot, update ):
         else:
             extra_msg = ''
         messages.append(extra_msg)
-        bot.sendMessage(chat_id, "\n".join(messages))
+        if CURRENT_MODE[chat_id]['mode'] == 'mp':
+            but1 = new
+            but2 = tag_search
+        elif CURRENT_MODE[chat_id]['mode'] == 'new':
+            but1 = popular
+            but2 = tag_search
+        elif CURRENT_MODE[chat_id]['mode'] == 'tg':
+            but1 = popular
+            but2 = new
+        else:
+            but1  = new
+            but2 = popular
+
+        repl = ReplyKeyboardMarkup([[but1],[but2]])
+        bot.sendMessage(chat_id, "\n".join(messages), repl)
     elif message == 'Популярное':
         courses = collection.find().sort('connections_count', -1)
         i = 0
@@ -143,6 +161,8 @@ def on_message( bot, update ):
             'from': i,
             'data': data[i:]
         }
+
+        repl = ReplyKeyboardMarkup([[new], [tag_search]])
 
         bot.sendMessage( chat_id=update.message.chat_id,
                          text='\n'.join(messages)
