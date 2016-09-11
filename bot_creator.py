@@ -1,12 +1,13 @@
+import re
+from subprocess import Popen
+import time
+
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram.replykeyboardmarkup import ReplyKeyboardMarkup
 from telegram import KeyboardButton
 from telegram.emoji import Emoji
 
-import re
-
-from subprocess import Popen
-
+from model.Courses import Courses
 
 def flash_course_run(token):
     bot = Popen(['python3', 'flash_course.py', token])
@@ -36,16 +37,22 @@ def on_done_command(bot, update):
                         reply_markup=add_message_keyboard)
         return
 
+    raw_data = dict()
+
     author = update.message.from_user
-    author = "{0} {1}".format(author['first_name'], author['last_name'])
+    raw_data['author'] = "{0} {1}".format(author['first_name'], author['last_name'])
 
     info = clients[chat_id][current_token]
-    messages = info['messages']
-    tags = info['tags']
-    description = info['description']
+    raw_data['messages'] = info['messages']
+    raw_data['tags'] = info['tags']
+    raw_data['description'] = info['description']
+    raw_data['timestamp'] = int(time.time())
+
+    raw_data['token'] = current_token
+
+    md.init_bot(raw_data)
 
     flash_course_run(current_token)
-    #todo send to db
 
 
 def on_message_handler(bot, update):
@@ -114,23 +121,25 @@ def on_message_handler(bot, update):
         return
 
 
-
-
-
 """ Helpers"""
+
+
 def helper_help(bot, chat_id):
     help_msg = 'Модуль в разработке.'
     help_cancel_keyboard = ReplyKeyboardMarkup(main_menu_button, one_time_keyboard=True)
     bot.sendMessage(chat_id=chat_id, text=help_msg, reply_markup=help_cancel_keyboard)
 
+
 def helper_got_token(bot, chat_id):
     clients[chat_id]['got_token'] = True
     bot.sendMessage(chat_id=chat_id, text='Введите токен')
+
 
 def helper_main_menu(bot, chat_id):
     clients[chat_id]['add_message_flag'] = clients[chat_id]['got_token'] = False
     start_keyboard = ReplyKeyboardMarkup(new_course_button + help_button, one_time_keyboard=True)
     bot.sendMessage(chat_id=chat_id, text='Отменено', reply_markup=start_keyboard)
+
 
 def helper_create_new_course(bot, chat_id):
     create_msg = "{0} Открывай @BotFather. Жмякай для этого на его имя".format(emoji_nums[1]) + '\n' + \
@@ -141,16 +150,16 @@ def helper_create_new_course(bot, chat_id):
     got_token_keyboard = ReplyKeyboardMarkup(got_token_button + main_menu_button, one_time_keyboard=True)
     bot.sendMessage(chat_id=chat_id, text=create_msg, reply_markup=got_token_keyboard)
 
+
 def helper_add_new_message(bot, chat_id):
     clients[chat_id]['add_message_flag'] = True
     bot.sendMessage(chat_id=chat_id, text='Напиши что хочешь добавить в свой микрокурс.')
 
-def helper_add_description(bot, chat_id):
-    pass
 
 if __name__ == '__main__':
     token = '254385124:AAFzW49rQixpdUMfGpG3h2FYB049lDtBYJk'
     clients = dict()
+    md = Courses()
 
     # bot
     updater = Updater(token=token)
@@ -175,8 +184,8 @@ if __name__ == '__main__':
                'Помощь': helper_help,
                'Главное меню': helper_main_menu,
                'Я получил токен': helper_got_token,
-               'Добавить сообщение в микрокурс': helper_add_new_message,
-               'Добавить описание' : helper_add_description}
+               'Добавить сообщение в микрокурс': helper_add_new_message }
+               # 'Добавить описание' : helper_add_description}
 
     # handlers
     start_message = CommandHandler('start', on_start_command)
