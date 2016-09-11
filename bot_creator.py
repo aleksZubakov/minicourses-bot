@@ -49,7 +49,7 @@ def on_done_command(bot, update):
     raw_data['timestamp'] = int(time.time())
 
     raw_data['token'] = current_token
-
+    raw_data['last_message'] = info['last_message']
     md.init_bot(raw_data)
 
     flash_course_run(current_token)
@@ -114,7 +114,7 @@ def on_message_handler(bot, update):
         clients[chat_id][current_token]['tags'] = msg.lower().split(' ')
 
         bot.sendMessage(chat_id=chat_id, text='Чудесно! Теперь напишите сообщение, которое будет заключительным'
-                                              'для вашего курсаю(можно оставить ссылку на ваш основной проект).')
+                                              'для вашего курса(можно оставить ссылку на ваш основной проект).')
 
         return
 
