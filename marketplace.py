@@ -98,7 +98,8 @@ def on_start_command( bot, update ):
     }
     # print('!!!',CURRENT_MODE, CURRENT_MODE[chat_id], '\n', CURRENT_MODE[chat_id]['data'])
 
-    repl = ReplyKeyboardMarkup([[show_more],[new]])
+    repl = ReplyKeyboardMarkup([[show_more],[new],
+                                [KeyboardButton("Поиск по тегам")]])
 
     bot.sendMessage( chat_id=update.message.chat_id,
                      text='\n'.join(messages),
@@ -111,9 +112,7 @@ def on_message( bot, update ):
     if message == 'Показать еще':
         i = 0
         messages = []
-        # print('>>', CURRENT_MODE)
-        # print('>>',CURRENT_MODE[str(chat_id)])
-        # print('>>', CURRENT_MODE[str(chat_id)]['data'])
+
         for ent in CURRENT_MODE[str(chat_id)]['data']:
             i += 1
             msg = u"""{0}: {1}
@@ -136,10 +135,12 @@ def on_message( bot, update ):
         messages.append(extra_msg)
         if CURRENT_MODE[str(chat_id)]['mode'] == 'mp':
             repl = ReplyKeyboardMarkup([[KeyboardButton('Показать еще')],
-                                        [KeyboardButton('Новое')]])
+                                        [KeyboardButton('Новое')],
+                                        [KeyboardButton('Поиск по тегам')]])
         elif CURRENT_MODE[str(chat_id)]['mode'] == 'new':
             repl = ReplyKeyboardMarkup([[KeyboardButton('Показать еще')],
-                                        [KeyboardButton('Популярное')]])
+                                        [KeyboardButton('Популярное')],
+                                        [KeyboardButton('Поиск по тегам')]])
         else:
             repl = ReplyKeyboardMarkup([[new], [popular]])
 
@@ -172,7 +173,8 @@ def on_message( bot, update ):
         }
 
         repl = ReplyKeyboardMarkup([[KeyboardButton('Показать еще')],
-                                    [KeyboardButton('Новое')]])
+                                    [KeyboardButton('Новое')],
+                                    [KeyboardButton('Поиск по тегам')]])
         bot.sendMessage( chat_id=update.message.chat_id,
                          text='\n'.join(messages), reply_markup=repl)
 
@@ -201,10 +203,45 @@ def on_message( bot, update ):
         }
 
         repl = ReplyKeyboardMarkup([[KeyboardButton('Показать еще')],
-                                    [KeyboardButton('Популярное')]])
+                                    [KeyboardButton('Популярное')],
+                                    [KeyboardButton('Поиск по тегам')]])
 
         bot.sendMessage(chat_id=update.message.chat_id,
                         text='\n'.join(messages), reply_markup=repl)
+    elif message == "Поиск по тегам":
+        CURRENT_MODE[str(chat_id)]['mode'] = 'tg'
+        CURRENT_MODE[str(chat_id)]['from'] = 0
+        CURRENT_MODE[str(chat_id)]['data'] = list()
+        bot.sendMessage(chat_id=update.message.chat_id,
+                        text="Введите Тег")
+
+    elif CURRENT_MODE[str(chat_id)]['mode'] == 'tg':
+        tag = str(update.message.text).lower()
+        msg = list()
+        msg.append("Результаты поиска")
+        courses = collection.find()
+        i = 1
+        for ent in courses:
+            try:
+                print(ent['tags'])
+                if tag in ent['tags']:
+                    msg.append(u"""{0}: {1}
+                        {2}
+                        Link: {3}
+                        By {4}, \U0001F464 ({5})
+                        Tags: {6}
+                        TOK: {7}""".format(i,*gen_data(ent)))
+            except (IndexError, KeyError):
+                pass
+
+        CURRENT_MODE[str(chat_id)]['mode'] = 'mp'
+
+        repl = ReplyKeyboardMarkup([[KeyboardButton("Популярное")],
+                                    [KeyboardButton("Новое")],
+                                    [KeyboardButton("Поиск по тегам")]])
+        bot.sendMessage(chat_id=update.message.chat_id,
+                        text="\n".join(msg),
+                        reply_markup=repl)
 
 
 

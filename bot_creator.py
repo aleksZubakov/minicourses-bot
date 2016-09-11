@@ -106,7 +106,7 @@ def on_message_handler(bot, update):
         clients[chat_id]['add_tag_flag'] = False
         clients[chat_id]['add_message_flag'] = True
 
-        clients[chat_id][current_token]['tags'] = msg.split(' ')
+        clients[chat_id][current_token]['tags'] = msg.lower().split(' ')
 
         bot.sendMessage(chat_id=chat_id, text='Прекрасно! Теперь добавляйте по одному сообщению к своему курсу. '
                                               'Когда закончите, напишите /done \n \nесли хотите прервать '
