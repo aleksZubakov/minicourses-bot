@@ -58,10 +58,10 @@ def gen_data( obj ):
     except KeyError:
         new_data.append('')
 
-    try:
-        new_data.append(obj['token'])
-    except KeyError:
-        new_data.append('')
+    # try:
+    #     new_data.append(obj['token'])
+    # except KeyError:
+    #     new_data.append('')
     return new_data
 
 
@@ -75,11 +75,10 @@ def on_start_command( bot, update ):
     for ent in data:
         i += 1
         msg = u"""{0}: {1}
-        {2}
-        Link: {3}
-        By {4}, \U0001F464 ({5})
-        Tags: {6}
-        TOK: {7}""".format(i,*gen_data(ent))
+    {2}
+    Link: {3}
+    By {4}, \U0001F464 ({5})
+    Tags: {6}""".format(i,*gen_data(ent))
         messages.append( msg )
         if i == 3:
             break
@@ -111,11 +110,10 @@ def on_message( bot, update ):
         for ent in CURRENT_MODE[str(chat_id)]['data']:
             i += 1
             msg = u"""{0}: {1}
-             {2}
-             Link: {3}
-             By {4}, \U0001F464 ({5})
-             Tags: {6}
-             TOK: {7}""".format(i + CURRENT_MODE[str(chat_id)]['from'], *gen_data(ent))
+        {2}
+        Link: {3}
+        By {4}, \U0001F464 ({5})
+        Tags: {6}""".format(i + CURRENT_MODE[str(chat_id)]['from'], *gen_data(ent))
             messages.append(msg)
             if i == 3:
                 break
@@ -153,11 +151,11 @@ def on_message( bot, update ):
         for ent in data:
             i += 1
             msg = u"""{0}: {1}
-                {2}
-                Link: {3}
-                By {4}, \U0001F464 ({5})
-                Tags: {6}
-                TOK: {7}""".format(i,*gen_data(ent))
+            {2}
+            Link: {3}
+            By {4}, \U0001F464 ({5})
+            Tags: {6}
+            """.format(i,*gen_data(ent))
             messages.append(msg)
             if i == 3:
                 break
@@ -185,11 +183,10 @@ def on_message( bot, update ):
         for ent in data:
             i += 1
             msg = u"""{0}: {1}
-                        {2}
-                        Link: {3}
-                        By {4}, \U0001F464 ({5})
-                        Tags: {6}
-                        TOK: {7}""".format(i,*gen_data(ent))
+            {2}
+            Link: {3}
+            By {4}, \U0001F464 ({5})
+            Tags: {6}""".format(i,*gen_data(ent))
             messages.append(msg)
             if i == 3:
                 break
@@ -226,11 +223,10 @@ def on_message( bot, update ):
                 print(ent['tags'])
                 if tag in ent['tags']:
                     msg.append(u"""{0}: {1}
-                        {2}
-                        Link: {3}
-                        By {4}, \U0001F464 ({5})
-                        Tags: {6}
-                        TOK: {7}""".format(i,*gen_data(ent)))
+                    {2}
+                    Link: {3}
+                    By {4}, \U0001F464 ({5})
+                    Tags: {6}""".format(i,*gen_data(ent)))
             except (IndexError, KeyError):
                 pass
 
