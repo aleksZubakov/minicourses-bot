@@ -5,6 +5,12 @@ from telegram.emoji import Emoji
 
 import re
 
+from subprocess import Popen
+
+
+def flash_course_run(token):
+    bot = Popen(['python3', 'flash_course.py', token])
+
 def on_start_command(bot, update):
     chat_id = update.message.chat_id
     clients[chat_id] = dict()
@@ -38,6 +44,7 @@ def on_done_command(bot, update):
     tags = info['tags']
     description = info['description']
 
+    flash_course_run(current_token)
     #todo send to db
 
 
@@ -52,7 +59,7 @@ def on_message_handler(bot, update):
     if clients[chat_id]['got_token']:
 
         token = update.message.text
-        valide_token = bool(re.match(r'[0-9]{9}:[a-zA-Z0-9_]{30}', token))
+        valide_token = bool(re.match(r'[0-9]{9}:\w+', token))
 
         #if valide create record for client
         if valide_token:
