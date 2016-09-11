@@ -25,11 +25,12 @@ class Courses:
         if bot_record is None:
             # From User Data
             data['token'] = raw_data['token']
-            data['bot_name'] = raw_data['name']
-            data['screen_name'] = raw_data['screen_name']
+            # data['bot_name'] = raw_data['name']
+            # data['screen_name'] = raw_data['screen_name']
             data['tags'] = raw_data['tags']
             data['author'] = raw_data['author']
             data['description'] = raw_data['description']
+            data['created_at'] = raw_data['timestamp']
             data['messages'] = list( raw_data['messages'] )
 
             # Init with default
@@ -41,6 +42,17 @@ class Courses:
         else:
             # print('Bot with token "{0}" already exists'.format(raw_data['token']))
             pass
+
+    def set_bot_name(self, bot_token, name, screen_name):
+        self.collection.update_one(
+            {'token': bot_token},
+            { '$set': {
+                'bot_name': name,
+                'screen_name': screen_name
+            }}
+        )
+
+
 
     def get_description(self):
         pass
