@@ -1,4 +1,5 @@
 import pymongo
+from random import randint
 
 client = pymongo.MongoClient()
 db = client['courses']
@@ -44,6 +45,7 @@ class Courses:
         pass
 
     def new_user(self, bot_token, chat_id):
+        chat_id = str(chat_id)
 
         bot_record = self.collection.find_one({ 'token': bot_token })
         # print(bot_record)
@@ -55,7 +57,9 @@ class Courses:
 
         new_user = connections[str(chat_id)] = dict()
         new_user['last_read'] = False
-        new_user['messages_number'] = 0
+        new_user['messages_number'] = 1
+        new_user['delays'] = [ 10, 10, 10, 10, 10 ]
+        new_user['missed'] = 0
 
         try:
             new_connections_count = bot_record['connections_count'] + 1
@@ -73,7 +77,7 @@ class Courses:
         )
 
         updated_bot_record = self.collection.find_one({ 'token': bot_token })
-        return updated_bot_record['messages'][0]
+        return 10, updated_bot_record['messages'][0]
 
     def get_info(self, bot_token, chat_id):
 
@@ -86,10 +90,15 @@ class Courses:
         # cur_msg_number = cur_connection['messages_number']
 
         if is_read:
-            msg_number = cur_connection['messages_number'] =  cur_connection['messages_number'] +  1
+            msg_number = cur_connection['messages_number'] = cur_connection['messages_number'] +  1
             cur_connection['last_read'] = False
         else:
             msg_number = cur_connection['messages_number']
+
+        try:
+            delay = cur_connection['next_delay'] + randint(-5, 5)
+        except KeyError:
+            delay = 10 + randint(-5, 5)
 
         self.collection.update(
             { 'token': bot_token },
@@ -99,18 +108,49 @@ class Courses:
         updated_bot_record = self.collection.find_one( { 'token': bot_token } )
         print(updated_bot_record)
 
-
-        return 10, updated_bot_record['messages'][msg_number]
-
+        return delay, updated_bot_record['messages'][msg_number]
 
 
 
 
-    def set_read(self, bot_token, chat_id):
+
+
+    def set_read(self, bot_token, chat_id, passed):
+        # print("!!!!!",bot_token, chat_id, passed)
         bot_record = self.collection.find_one({ 'token': bot_token })
-
+        chat_id = str(chat_id)
+        # print(1, bot_record)
         connections = bot_record['connections']
-        connections[chat_id]['last_read'] = True
+        # print(2, connections)
+        # print('!!!!',chat_id, connections[chat_id])
+        connection = connections[chat_id]
+        # print(3, connection)
+
+        # connections[chat_id]['last_read'] = True
+        connection['last_read'] = True
+        # print(connection)
+        delays = connection['delays']
+        msg_count = connection['messages_number'] + 1
+        missed = connection['missed']
+
+        i = msg_count + missed + 1
+
+        if passed > delays[ i % 5 ]:
+            delays[(i - 1) % 5] = delays[(i - 1) % 5] + delays[ i % 5 ]
+            delays[ i % 5 ] = passed - delays[ i % 5 ]
+            delays[ (i + 1) % 5 ] = delays[ (i + 1) % 5 ] - delays[ i % 5 ]
+            missed += 1
+            delay = delays[ (i + 1) % 5 ]
+        else:
+            delays[ i % 5 ] -= passed
+            delays[ (i - 1) % 5 ] += passed
+            delay = delays[ i % 5 ]
+
+
+        print("!!!!", delay)
+        connection['next_delay'] = delay
+
+
 
         self.collection.update(
             { 'token': bot_token },
