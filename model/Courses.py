@@ -55,8 +55,12 @@ class Courses:
 
 
 
-    def get_description(self):
-        pass
+    def get_description_name(self, bot_token):
+        bot_record = self.collection.find_one( {'token': bot_token } )
+        try:
+            return bot_record['bot_name']
+        except (IndexError, KeyError):
+            return ""
 
     def new_user(self, bot_token, chat_id):
         chat_id = str(chat_id)
