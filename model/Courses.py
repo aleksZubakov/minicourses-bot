@@ -39,23 +39,21 @@ class Courses:
             self.collection.insert_one(data)
             return True
         else:
-            raise Error('Bot with token "{0}" already exists'.format(raw_data['token']))
+            # print('Bot with token "{0}" already exists'.format(raw_data['token']))
+            pass
 
     def get_description(self):
         pass
 
     def new_user(self, bot_token, chat_id):
         chat_id = str(chat_id)
-        print(self.collection, bot_token, chat_id)
+        # print(self.collection, bot_token, chat_id)
         bot_record = self.collection.find_one({ 'token': bot_token })
-        print(bot_record)
+        # print(bot_record)
         if bot_record is None:
-            for i in self.collection.find():
-                print(i)
-            for db in client.database_names():
-                print(db)
-            print('Not bot present with token "{0}"'.format(bot_token))
-        print('>',bot_record)
+            # print('Not bot present with token "{0}"'.format(bot_token))
+            pass
+        # print('>',bot_record)
 
         connections = bot_record['connections']
 
@@ -110,7 +108,7 @@ class Courses:
         )
 
         updated_bot_record = self.collection.find_one( { 'token': bot_token } )
-        print(updated_bot_record)
+        # print(updated_bot_record)
 
         return delay, updated_bot_record['messages'][msg_number]
 
@@ -151,7 +149,7 @@ class Courses:
             delay = delays[ i % 5 ]
 
 
-        print("!!!!", delay)
+        # print("!!!!", delay)
         connection['next_delay'] = delay
 
 
