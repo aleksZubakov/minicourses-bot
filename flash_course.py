@@ -25,15 +25,14 @@ def on_start_command(bot, update):
 
     user_name = update.message.from_user['first_name'] + " " + update.message.from_user['last_name']
     welcome_message = 'Привет, {0}.'.format(user_name) + \
-                      'Ты подписался на курс %название курса%'
-                    # + db.get_description(token)
+                      'Ты подписался на курс {0}.'.format(md.get_description_name(token))
     bot.sendMessage(chat_id=chat_id, text=welcome_message)
 
     bot.sendMessage(chat_id=chat_id, text=first_message)
 
 def on_text_message(bot, update):
     chat_id = update.message.chat_id
-    if update.message.text == 'Прочитал, вполне прикольно :)':
+    if update.message.text == 'Прочитал, очень интересно!)':
         bot.sendMessage(chat_id=chat_id, text='А ты хорош:)')
         md.set_read(token, chat_id, clients[chat_id]['passed'])
         # print('<<<<<',new_delay)
@@ -70,7 +69,7 @@ def send_course_message():
                     # message = 'lorem ipsum'
                     timer, message = md.get_info(token, chat_id)
                     # print('!!',timer, message)
-                    key_board = ReplyKeyboardMarkup([['Прочитал, вполне прикольно :)']], one_time_keyboard=True)
+                    key_board = ReplyKeyboardMarkup([['Прочитал, очень интересно!)']], one_time_keyboard=True)
                     updater.bot.sendMessage(chat_id=chat_id, text=message, reply_markup=key_board)
 
                     client['red_message'] = False
