@@ -3,17 +3,43 @@ from telegram.replykeyboardmarkup import ReplyKeyboardMarkup
 from telegram import KeyboardButton
 from telegram.emoji import Emoji
 
+import re
 
 def on_start_command(bot, update):
     chat_id = update.message.chat_id
     clients[chat_id] = dict()
-    clients[chat_id]['got_token'] = clients[chat_id]['add_flag'] = False
+    clients[chat_id]['got_token'] = clients[chat_id]['add_message_flag'] \
+        = clients[chat_id]['add_description_flag'] =  clients[chat_id]['add_tag_flag'] = False
 
     start_keyboard = ReplyKeyboardMarkup(new_course_button + help_button, one_time_keyboard=True)
-    bot.sendMessage(chat_id=chat_id, text='Привет! Ты попал в @sympocreator_bot. Выбирай действие:)', reply_markup=start_keyboard)
+    bot.sendMessage(chat_id=chat_id, text='Привет! Ты попал в @sympocreator_bot. Выбирай действие:)',
+                    reply_markup=start_keyboard)
+
 
 def on_done_command(bot, update):
-    pass
+    chat_id = update.message.chat_id
+    current_token = clients[chat_id]['current_token']
+
+    # now client can't add new message
+    clients[chat_id]['add_message_flag'] = False
+
+    if not clients[chat_id][current_token]['messages']:
+
+        add_message_keyboard = ReplyKeyboardMarkup(add_message_button + main_menu_button)
+        bot.sendMessage(chat_id=chat_id, text='Извините, но бот не создан, поскольку вы не ввели ни одного сообщения',
+                        reply_markup=add_message_keyboard)
+        return
+
+    author = update.message.from_user
+    author = "{0} {1}".format(author['first_name'], author['last_name'])
+
+    info = clients[chat_id][current_token]
+    messages = info['messages']
+    tags = info['tags']
+    description = info['description']
+
+    #todo send to db
+
 
 def on_message_handler(bot, update):
     msg = update.message.text
@@ -23,45 +49,66 @@ def on_message_handler(bot, update):
         helpers[msg](bot, chat_id)
         return
 
-    if clients[chat_id]['add_flag']:
-        # get current bot token
-        current_token = clients[chat_id]['current_token']
-        # add message to bot token
-        clients[chat_id][current_token].append(update.message.text)
-
-        # now client can't add new message
-        clients[chat_id]['add_flag'] = False
-
-        add_more_keyboard = ReplyKeyboardMarkup(add_more_button + main_menu_button, one_time_keyboard=True)
-        bot.sendMessage(chat_id=chat_id, text='Спасибо. Нажми кнопку добавить еще, если есть что добавить '
-                                              'или выйди в главное меню.', reply_markup=add_more_keyboard)
-        return
-
     if clients[chat_id]['got_token']:
-        #todo write function to validate token!
+
         token = update.message.text
-        valide_token = True
+        valide_token = bool(re.match(r'[0-9]{9}:[a-zA-Z0-9_]{30}', token))
 
         #if valide create record for client
         if valide_token:
             if not chat_id in clients:
                 clients[chat_id] = dict()
 
-            #list of messages
-            clients[chat_id][token] = list()
+
+            clients[chat_id][token] = dict()
+            clients[chat_id][token]['messages'] = list()
             clients[chat_id]['current_token'] = token
 
-            add_message_button = [[KeyboardButton(text='Добавить сообщение в микрокурс')]]
-            add_message_keyboard = ReplyKeyboardMarkup(add_message_button + main_menu_button,
-                                                       one_time_keyboard=True)
-            bot.sendMessage(chat_id=chat_id, text='Отлично! Вы ввели правильный токен!',
-                            reply_markup=add_message_keyboard)
+            bot.sendMessage(chat_id=chat_id, text='Отлично! Вы ввели правильный токен! Отправьте описание '
+                                                  'вашего микрокурса в следующем сообщении')
+            clients[chat_id]['add_description_flag'] = True
 
         else:
             start_keyboard = ReplyKeyboardMarkup(new_course_button + help_button)
             bot.sendMessage(chat_id=chat_id, text='Извините, но токен не валидный.', reply_markup=start_keyboard)
 
         clients[chat_id]['got_token'] = False
+        return
+
+    current_token = clients[chat_id]['current_token']
+    msg = update.message.text # !
+
+    if clients[chat_id]['add_description_flag']:
+        clients[chat_id]['add_description_flag'] = False
+        clients[chat_id]['add_tag_flag'] = True
+
+        clients[chat_id][current_token]['description'] = msg
+
+        bot.sendMessage(chat_id=chat_id, text='Превосходно! Напишите 1-3 тега к вашему курсу в '
+                                              'следующем сообщении \n \nили введите /cancel')
+
+        return
+
+    if clients[chat_id]['add_tag_flag']:
+        clients[chat_id]['add_tag_flag'] = False
+        clients[chat_id]['add_message_flag'] = True
+
+        clients[chat_id][current_token]['tags'] = msg.split(' ')
+
+        bot.sendMessage(chat_id=chat_id, text='Прекрасно! Теперь добавляйте по одному сообщению к своему курсу. '
+                                              'Когда закончите, напишите /done \n \nесли хотите прервать '
+                                              'напишите /cancel')
+        return
+
+    if clients[chat_id]['add_message_flag']:
+        # add message to bot token
+        clients[chat_id][current_token]['messages'].append(update.message.text)
+
+        return
+
+
+
+
 
 """ Helpers"""
 def helper_help(bot, chat_id):
@@ -74,7 +121,7 @@ def helper_got_token(bot, chat_id):
     bot.sendMessage(chat_id=chat_id, text='Введите токен')
 
 def helper_main_menu(bot, chat_id):
-    clients[chat_id]['add_flag'] = clients[chat_id]['got_token'] = False
+    clients[chat_id]['add_message_flag'] = clients[chat_id]['got_token'] = False
     start_keyboard = ReplyKeyboardMarkup(new_course_button + help_button, one_time_keyboard=True)
     bot.sendMessage(chat_id=chat_id, text='Отменено', reply_markup=start_keyboard)
 
@@ -83,14 +130,16 @@ def helper_create_new_course(bot, chat_id):
                  "{0} С его помощью создай нового бота. Для этого нажми 'new bot' внутри @BotFather".format(
                      emoji_nums[2]) + '\n' + \
                  "{0} Скопируй API token, который он тебе даст.".format(emoji_nums[3]) + '\n' + \
-                 "{0} Вернись обратно в @sypmocreator_bot и отправь сюда скопированный API token".format(emoji_nums[4])
+                 "{0} Вернись обратно в @sypmocreator_bot и отправь сюда скопированный API токен".format(emoji_nums[4])
     got_token_keyboard = ReplyKeyboardMarkup(got_token_button + main_menu_button, one_time_keyboard=True)
     bot.sendMessage(chat_id=chat_id, text=create_msg, reply_markup=got_token_keyboard)
 
 def helper_add_new_message(bot, chat_id):
-    clients[chat_id]['add_flag'] = True
+    clients[chat_id]['add_message_flag'] = True
     bot.sendMessage(chat_id=chat_id, text='Напиши что хочешь добавить в свой микрокурс.')
 
+def helper_add_description(bot, chat_id):
+    pass
 
 if __name__ == '__main__':
     token = '254385124:AAFzW49rQixpdUMfGpG3h2FYB049lDtBYJk'
@@ -110,9 +159,9 @@ if __name__ == '__main__':
     new_course_button = [[KeyboardButton(text='Создать новый микрокурс')]]
     help_button = [[KeyboardButton(text='Помощь')]]
     main_menu_button = [[KeyboardButton(text='Главное меню')]]
-    add_button = [[KeyboardButton(text='Добавить сообщение в микрокурс')]]
-    add_more_button = [[KeyboardButton(text='Добавить еще')]]
+    add_message_button = [[KeyboardButton(text='Добавить сообщение в микрокурс')]]
     got_token_button = [[KeyboardButton(text='Я получил токен')]]
+    add_description_button = [[KeyboardButton(text='Добавить описание')]]
 
     # helpers
     helpers = {'Создать новый микрокурс': helper_create_new_course,
@@ -120,15 +169,15 @@ if __name__ == '__main__':
                'Главное меню': helper_main_menu,
                'Я получил токен': helper_got_token,
                'Добавить сообщение в микрокурс': helper_add_new_message,
-               'Добавить еще': helper_add_new_message}
+               'Добавить описание' : helper_add_description}
 
-    #handlers
+    # handlers
     start_message = CommandHandler('start', on_start_command)
     on_message = MessageHandler([Filters.text], on_message_handler)
     on_done = CommandHandler('done', on_done_command)
 
     dispatcher.add_handler(start_message)
     dispatcher.add_handler(on_message)
-    dispatcher.add_handler(on_done_command)
+    dispatcher.add_handler(on_done)
 
     updater.start_polling()

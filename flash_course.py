@@ -89,6 +89,7 @@ def send_course_message():
 if __name__ == '__main__':
     #variables
     clients = dict()
+    print('test')
 
     #token parsing
     parser = argparse.ArgumentParser(description='Run flash-course telegram bot by your token')
