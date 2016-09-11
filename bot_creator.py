@@ -10,7 +10,7 @@ from telegram.emoji import Emoji
 from model.Courses import Courses
 
 def flash_course_run(token):
-    bot = Popen(['python3', 'flash_course.py', token])
+    bot = Popen(['python3.5', 'flash_course.py', token])
 
 def on_start_command(bot, update):
     chat_id = update.message.chat_id
@@ -66,7 +66,7 @@ def on_message_handler(bot, update):
     if clients[chat_id]['got_token']:
 
         token = update.message.text
-        valide_token = bool(re.match(r'[0-9]{9}:\w+', token))
+        valide_token = bool(re.match(r'[0-9]{9}:.+', token))
 
         #if valide create record for client
         if valide_token:
