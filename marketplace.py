@@ -8,8 +8,8 @@ import pymongo
 # Setup database
 client = pymongo.MongoClient()
 db = client['courses']
-# TODO here is test purposes
-collection = db['test']
+# TODO here is test purposes -- DONE
+collection = db['courses']
 
 # setup updater, dispatcher, and logging
 updater = Updater( token='296973878:AAG8-Gu2ESh8rSbXX0S14R_8uJtC4opjCKY' )

@@ -156,7 +156,7 @@ def helper_add_new_message(bot, chat_id):
 
 
 if __name__ == '__main__':
-    token = '254385124:AAFzW49rQixpdUMfGpG3h2FYB049lDtBYJk'
+    token = '294379760:AAG09m0GKPJfj1J0aNF0QUCd23WrLMUuz8M'
     clients = dict()
     md = Courses()
 

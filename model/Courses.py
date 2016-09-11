@@ -11,7 +11,7 @@ courses_collection = db['test']
 class Courses:
 
     def __init__(self):
-        self.env = 'dev'
+        self.env = 'prod'
 
         if self.env == 'dev':
             self.collection = db['test']
