@@ -5,14 +5,12 @@
 
 import argparse
 
-import logging
 import asyncio
 import threading
 
 
 from telegram.ext import Updater, Handler, CommandHandler, MessageHandler, Filters
 from telegram.replykeyboardmarkup import ReplyKeyboardMarkup
-from telegram import KeyboardButton
 from model.Courses import Courses
 
 """ Handlers """
@@ -39,10 +37,10 @@ def on_text_message(bot, update):
         bot.sendMessage(chat_id=chat_id, text='А ты хорош:)')
         md.set_read(token, chat_id, clients[chat_id]['passed'])
         # print('<<<<<',new_delay)
-        print("<<<<<",clients)
+        #print("<<<<<",clients)
         clients[chat_id]['red_message'] = True
         # clients[chat_id]['timer'] = new_delay
-        print(clients)
+        #print(clients)
 
 
 """Wrappers"""
@@ -70,7 +68,7 @@ def send_course_message():
                 # print(clients)
                 if client['red_message']:
                     # message = 'lorem ipsum'
-                    timer, message =  md.get_info(token, chat_id)
+                    timer, message = md.get_info(token, chat_id)
                     # print('!!',timer, message)
                     key_board = ReplyKeyboardMarkup([['Прочитал, вполне прикольно :)']], one_time_keyboard=True)
                     updater.bot.sendMessage(chat_id=chat_id, text=message, reply_markup=key_board)
@@ -90,6 +88,7 @@ if __name__ == '__main__':
     #variables
     # print(1)
     clients = dict()
+    #print('test')
 
     #token parsing
     parser = argparse.ArgumentParser(description='Run flash-course telegram bot by your token')
@@ -99,6 +98,7 @@ if __name__ == '__main__':
 
     #telegram updater
     updater = Updater(token=token)
+    updater.bot.getMe()
     dispatcher = updater.dispatcher
 
     #handlers
