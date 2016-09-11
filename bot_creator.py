@@ -16,7 +16,8 @@ def on_start_command(bot, update):
     chat_id = update.message.chat_id
     clients[chat_id] = dict()
     clients[chat_id]['got_token'] = clients[chat_id]['add_message_flag'] \
-        = clients[chat_id]['add_description_flag'] =  clients[chat_id]['add_tag_flag'] = False
+        = clients[chat_id]['add_description_flag'] = clients[chat_id]['add_tag_flag'] \
+        = clients[chat_id]['last_message_flag'] = False
 
     start_keyboard = ReplyKeyboardMarkup(new_course_button + help_button, one_time_keyboard=True)
     bot.sendMessage(chat_id=chat_id, text='Привет! Ты попал в @sympocreator_bot. Выбирай действие:)',
@@ -31,7 +32,6 @@ def on_done_command(bot, update):
     clients[chat_id]['add_message_flag'] = False
 
     if not clients[chat_id][current_token]['messages']:
-
         add_message_keyboard = ReplyKeyboardMarkup(add_message_button + main_menu_button)
         bot.sendMessage(chat_id=chat_id, text='Извините, но бот не создан, поскольку вы не ввели ни одного сообщения',
                         reply_markup=add_message_keyboard)
@@ -53,6 +53,10 @@ def on_done_command(bot, update):
     md.init_bot(raw_data)
 
     flash_course_run(current_token)
+
+    start_keyboard = ReplyKeyboardMarkup(new_course_button + help_button, resize_keyboard=False, one_time_keyboard=True)
+    bot.sendMessage(chat_id=chat_id, text='Поздравляем! Ваш бот успешно создан. Удачи!:)', reply_markup=start_keyboard)
+
 
 
 def on_message_handler(bot, update):
@@ -82,7 +86,8 @@ def on_message_handler(bot, update):
             clients[chat_id]['add_description_flag'] = True
 
         else:
-            start_keyboard = ReplyKeyboardMarkup(new_course_button + help_button)
+            start_keyboard = ReplyKeyboardMarkup(new_course_button + help_button, one_time_keyboard=True,
+                                                 resize_keyboard=False)
             bot.sendMessage(chat_id=chat_id, text='Извините, но токен не валидный.', reply_markup=start_keyboard)
 
         clients[chat_id]['got_token'] = False
@@ -104,9 +109,20 @@ def on_message_handler(bot, update):
 
     if clients[chat_id]['add_tag_flag']:
         clients[chat_id]['add_tag_flag'] = False
-        clients[chat_id]['add_message_flag'] = True
+        clients[chat_id]['last_message_flag'] = True
 
         clients[chat_id][current_token]['tags'] = msg.lower().split(' ')
+
+        bot.sendMessage(chat_id=chat_id, text='Чудесно! Теперь напишите сообщение, которое будет заключительным'
+                                              'для вашего курсаю(можно оставить ссылку на ваш основной проект).')
+
+        return
+
+    if clients[chat_id]['last_message_flag']:
+        clients[chat_id]['last_message_flag'] = False
+        clients[chat_id]['add_message_flag'] = True
+
+        clients[chat_id][current_token]['last_message'] = msg
 
         bot.sendMessage(chat_id=chat_id, text='Прекрасно! Теперь добавляйте по одному сообщению к своему курсу. '
                                               'Когда закончите, напишите /done \n \nесли хотите прервать '
@@ -125,7 +141,7 @@ def on_message_handler(bot, update):
 
 def helper_help(bot, chat_id):
     help_msg = 'Модуль в разработке.'
-    help_cancel_keyboard = ReplyKeyboardMarkup(main_menu_button, one_time_keyboard=True)
+    help_cancel_keyboard = ReplyKeyboardMarkup(main_menu_button, one_time_keyboard=True, resize_keyboard=False)
     bot.sendMessage(chat_id=chat_id, text=help_msg, reply_markup=help_cancel_keyboard)
 
 
@@ -136,7 +152,7 @@ def helper_got_token(bot, chat_id):
 
 def helper_main_menu(bot, chat_id):
     clients[chat_id]['add_message_flag'] = clients[chat_id]['got_token'] = False
-    start_keyboard = ReplyKeyboardMarkup(new_course_button + help_button, one_time_keyboard=True)
+    start_keyboard = ReplyKeyboardMarkup(new_course_button + help_button, one_time_keyboard=True, resize_keyboard=False)
     bot.sendMessage(chat_id=chat_id, text='Отменено', reply_markup=start_keyboard)
 
 
@@ -146,7 +162,8 @@ def helper_create_new_course(bot, chat_id):
                      emoji_nums[2]) + '\n' + \
                  "{0} Скопируй API token, который он тебе даст.".format(emoji_nums[3]) + '\n' + \
                  "{0} Вернись обратно в @sypmocreator_bot и отправь сюда скопированный API токен".format(emoji_nums[4])
-    got_token_keyboard = ReplyKeyboardMarkup(got_token_button + main_menu_button, one_time_keyboard=True)
+    got_token_keyboard = ReplyKeyboardMarkup(got_token_button + main_menu_button, one_time_keyboard=True,
+                                             resize_keyboard=False)
     bot.sendMessage(chat_id=chat_id, text=create_msg, reply_markup=got_token_keyboard)
 
 
