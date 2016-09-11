@@ -122,7 +122,13 @@ class Courses:
         updated_bot_record = self.collection.find_one( { 'token': bot_token } )
         # print(updated_bot_record)
 
-        return delay, updated_bot_record['messages'][msg_number]
+        try:
+            message_to_send = updated_bot_record['messages'][msg_number]
+        except IndexError:
+            message_to_send = 'Вы сделали это - больше никаких заданий'
+            delay = -1
+
+        return delay, message_to_send
 
 
 
