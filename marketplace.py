@@ -182,6 +182,7 @@ def on_message( bot, update ):
         courses = collection.find().sort('created_at', -1)
         i = 0
         messages = list()
+        messages.append("Новое /")
         data = list(courses)
         for ent in data:
             i += 1
