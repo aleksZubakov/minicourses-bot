@@ -11,7 +11,7 @@ courses_collection = db['test']
 class Courses:
 
     def __init__(self):
-        self.env = 'dev'
+        self.env = 'prod'
 
         if self.env == 'dev':
             self.collection = db['test']
@@ -24,7 +24,7 @@ class Courses:
         bot_record = self.collection.find_one( { 'token': raw_data['token'] } )
         if bot_record is None:
             # From User Data
-            data['token'] = raw_data['token']
+            data['token'] = str(raw_data['token'])
             # data['bot_name'] = raw_data['name']
             # data['screen_name'] = raw_data['screen_name']
             data['tags'] = raw_data['tags']
@@ -122,7 +122,13 @@ class Courses:
         updated_bot_record = self.collection.find_one( { 'token': bot_token } )
         # print(updated_bot_record)
 
-        return delay, updated_bot_record['messages'][msg_number]
+        try:
+            message_to_send = updated_bot_record['messages'][msg_number]
+        except IndexError:
+            message_to_send = 'Вы сделали это - больше никаких заданий'
+            delay = -1
+
+        return delay, message_to_send
 
 
 

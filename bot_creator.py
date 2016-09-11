@@ -10,7 +10,7 @@ from telegram.emoji import Emoji
 from model.Courses import Courses
 
 def flash_course_run(token):
-    bot = Popen(['python3', 'flash_course.py', token])
+    bot = Popen(['python3.5', 'flash_course.py', token])
 
 def on_start_command(bot, update):
     chat_id = update.message.chat_id
@@ -70,7 +70,7 @@ def on_message_handler(bot, update):
     if clients[chat_id]['got_token']:
 
         token = update.message.text
-        valide_token = bool(re.match(r'[0-9]{9}:\w+', token))
+        valide_token = bool(re.match(r'[0-9]{9}:.+', token))
 
         #if valide create record for client
         if valide_token:
@@ -111,7 +111,7 @@ def on_message_handler(bot, update):
         clients[chat_id]['add_tag_flag'] = False
         clients[chat_id]['last_message_flag'] = True
 
-        clients[chat_id][current_token]['tags'] = msg.split(' ')
+        clients[chat_id][current_token]['tags'] = msg.lower().split(' ')
 
         bot.sendMessage(chat_id=chat_id, text='Чудесно! Теперь напишите сообщение, которое будет заключительным'
                                               'для вашего курсаю(можно оставить ссылку на ваш основной проект).')
@@ -173,7 +173,7 @@ def helper_add_new_message(bot, chat_id):
 
 
 if __name__ == '__main__':
-    token = '254385124:AAFzW49rQixpdUMfGpG3h2FYB049lDtBYJk'
+    token = '294379760:AAG09m0GKPJfj1J0aNF0QUCd23WrLMUuz8M'
     clients = dict()
     md = Courses()
 
