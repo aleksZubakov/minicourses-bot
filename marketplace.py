@@ -64,12 +64,6 @@ def gen_data( obj ):
         new_data.append('')
     return new_data
 
-# unknown command handler
-# def on_unknown_command(bot, update):
-#     bot.sendMessage( chat_id=update.message.chat_id,
-#                      text="Sorry, but I don't know what {0} means".format(update.message.text))
-#
-# on_unknown_handler = MessageHandler( [ Filters.command ], on_unknown_command )
 
 def on_start_command( bot, update ):
 
@@ -99,7 +93,8 @@ def on_start_command( bot, update ):
     # print('!!!',CURRENT_MODE, CURRENT_MODE[chat_id], '\n', CURRENT_MODE[chat_id]['data'])
 
     repl = ReplyKeyboardMarkup([[show_more],[new],
-                                [KeyboardButton("Поиск по тегам")]])
+                                [KeyboardButton("Поиск по тегам")]],
+                               resize_keyboard=False)
 
     bot.sendMessage( chat_id=update.message.chat_id,
                      text='\n'.join(messages),
@@ -136,11 +131,13 @@ def on_message( bot, update ):
         if CURRENT_MODE[str(chat_id)]['mode'] == 'mp':
             repl = ReplyKeyboardMarkup([[KeyboardButton('Показать еще')],
                                         [KeyboardButton('Новое')],
-                                        [KeyboardButton('Поиск по тегам')]])
+                                        [KeyboardButton('Поиск по тегам')]],
+                                       resize_keyboard=False)
         elif CURRENT_MODE[str(chat_id)]['mode'] == 'new':
             repl = ReplyKeyboardMarkup([[KeyboardButton('Показать еще')],
                                         [KeyboardButton('Популярное')],
-                                        [KeyboardButton('Поиск по тегам')]])
+                                        [KeyboardButton('Поиск по тегам')]],
+                                       resize_keyboard=False)
         else:
             repl = ReplyKeyboardMarkup([[new], [popular]])
 
@@ -174,7 +171,8 @@ def on_message( bot, update ):
 
         repl = ReplyKeyboardMarkup([[KeyboardButton('Показать еще')],
                                     [KeyboardButton('Новое')],
-                                    [KeyboardButton('Поиск по тегам')]])
+                                    [KeyboardButton('Поиск по тегам')]],
+                                   resize_keyboard=False)
         bot.sendMessage( chat_id=update.message.chat_id,
                          text='\n'.join(messages), reply_markup=repl)
 
@@ -205,7 +203,8 @@ def on_message( bot, update ):
 
         repl = ReplyKeyboardMarkup([[KeyboardButton('Показать еще')],
                                     [KeyboardButton('Популярное')],
-                                    [KeyboardButton('Поиск по тегам')]])
+                                    [KeyboardButton('Поиск по тегам')]],
+                                   resize_keyboard=False)
 
         bot.sendMessage(chat_id=update.message.chat_id,
                         text='\n'.join(messages), reply_markup=repl)
@@ -239,7 +238,8 @@ def on_message( bot, update ):
 
         repl = ReplyKeyboardMarkup([[KeyboardButton("Популярное")],
                                     [KeyboardButton("Новое")],
-                                    [KeyboardButton("Поиск по тегам")]])
+                                    [KeyboardButton("Поиск по тегам")]],
+                                   resize_keyboard=False)
         bot.sendMessage(chat_id=update.message.chat_id,
                         text="\n".join(msg),
                         reply_markup=repl)

@@ -32,6 +32,7 @@ class Courses:
             data['description'] = raw_data['description']
             data['created_at'] = raw_data['timestamp']
             data['messages'] = list( raw_data['messages'] )
+            data['last_message'] = raw_data['last_message']
 
             # Init with default
             data['connections_count'] = 0
@@ -125,7 +126,7 @@ class Courses:
         try:
             message_to_send = updated_bot_record['messages'][msg_number]
         except IndexError:
-            message_to_send = 'Вы сделали это - больше никаких заданий'
+            message_to_send = updated_bot_record['last_message']
             delay = -1
 
         return delay, message_to_send
