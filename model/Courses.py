@@ -24,7 +24,7 @@ class Courses:
         bot_record = self.collection.find_one( { 'token': raw_data['token'] } )
         if bot_record is None:
             # From User Data
-            data['token'] = raw_data['token']
+            data['token'] = str(raw_data['token'])
             # data['bot_name'] = raw_data['name']
             # data['screen_name'] = raw_data['screen_name']
             data['tags'] = raw_data['tags']

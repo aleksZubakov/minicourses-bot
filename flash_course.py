@@ -106,7 +106,7 @@ if __name__ == '__main__':
 
     bt_name = updater.bot.getMe()
 
-    md.set_name(token, bt_name['username'], '{0} {1}'.format(bt_name['first_name'], bt_name['last_name']))
+    md.set_bot_name(token, bt_name['username'], '{0} {1}'.format(bt_name['first_name'], bt_name['last_name']))
 
     #handlers
     start_handler = CommandHandler('start', on_start_command)
