@@ -58,7 +58,7 @@ class Courses:
     def get_description_name(self, bot_token):
         bot_record = self.collection.find_one( {'token': bot_token } )
         try:
-            return bot_record['bot_name']
+            return bot_record['screen_name']
         except (IndexError, KeyError):
             return ""
 
