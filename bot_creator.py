@@ -9,8 +9,11 @@ def on_start_command(bot, update):
     clients[chat_id] = dict()
     clients[chat_id]['got_token'] = clients[chat_id]['add_flag'] = False
 
+    start_keyboard = ReplyKeyboardMarkup(new_course_button + help_button, one_time_keyboard=True)
     bot.sendMessage(chat_id=chat_id, text='Привет! Ты попал в @sympocreator_bot. Выбирай действие:)', reply_markup=start_keyboard)
 
+def on_done_command(bot, update):
+    pass
 
 def on_message_handler(bot, update):
     msg = update.message.text
@@ -122,7 +125,10 @@ if __name__ == '__main__':
     #handlers
     start_message = CommandHandler('start', on_start_command)
     on_message = MessageHandler([Filters.text], on_message_handler)
+    on_done = CommandHandler('done', on_done_command)
+
     dispatcher.add_handler(start_message)
     dispatcher.add_handler(on_message)
+    dispatcher.add_handler(on_done_command)
 
     updater.start_polling()
