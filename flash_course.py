@@ -18,9 +18,9 @@ from model.Courses import Courses
 """ Handlers """
 def on_start_command(bot, update):
     chat_id = update.message.chat_id
-    #rint('>>',chat_id, token)
-    timer, first_message = 123, 123 #md.new_user(token, chat_id)
-    #print('>>',timer, first_message)
+    # print('>>',chat_id, token)
+    timer, first_message = md.new_user(token, chat_id)
+    # print('>>',timer, first_message)
     clients[chat_id] = {'red_message': True,
                         'timer': timer,
                         'passed': 0}
@@ -39,10 +39,10 @@ def on_text_message(bot, update):
         bot.sendMessage(chat_id=chat_id, text='А ты хорош:)')
         md.set_read(token, chat_id, clients[chat_id]['passed'])
         # print('<<<<<',new_delay)
-        #print("<<<<<",clients)
+        print("<<<<<",clients)
         clients[chat_id]['red_message'] = True
         # clients[chat_id]['timer'] = new_delay
-        #print(clients)
+        print(clients)
 
 
 """Wrappers"""
@@ -67,11 +67,11 @@ def send_course_message():
 
         for chat_id, client in clients.items():
             if client['timer'] <= 0:
-                #print(clients)
+                # print(clients)
                 if client['red_message']:
                     # message = 'lorem ipsum'
                     timer, message =  md.get_info(token, chat_id)
-                    #print('!!',timer, message)
+                    # print('!!',timer, message)
                     key_board = ReplyKeyboardMarkup([['Прочитал, вполне прикольно :)']], one_time_keyboard=True)
                     updater.bot.sendMessage(chat_id=chat_id, text=message, reply_markup=key_board)
 
@@ -88,8 +88,8 @@ def send_course_message():
 
 if __name__ == '__main__':
     #variables
+    # print(1)
     clients = dict()
-    #print('test')
 
     #token parsing
     parser = argparse.ArgumentParser(description='Run flash-course telegram bot by your token')
